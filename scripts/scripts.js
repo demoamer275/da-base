@@ -74,6 +74,26 @@ function buildWidgetAutoBlocks(main) {
 }
 
 /**
+ * Turns standalone links matching a pattern into blocks (author-kit style link blocks).
+ * Links already inside an authored block are left alone.
+ * @param {Element} main The container element
+ */
+function buildLinkAutoBlocks(main) {
+  const linkBlocks = [
+    { name: 'schedule', selector: 'a[href*="/schedules/"]' },
+    { name: 'youtube', selector: 'a[href*="youtube.com/watch"], a[href*="youtu.be/"]' },
+  ];
+  linkBlocks.forEach(({ name, selector }) => {
+    main.querySelectorAll(selector).forEach((link) => {
+      if (link.closest('div[class]')) return;
+      const p = link.closest('p');
+      if (!p || p.textContent.trim() !== link.textContent.trim()) return;
+      p.replaceWith(buildBlock(name, { elems: [link.cloneNode(true)] }));
+    });
+  });
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
@@ -97,6 +117,7 @@ function buildAutoBlocks(main) {
       });
     }
     buildWidgetAutoBlocks(main);
+    buildLinkAutoBlocks(main);
   } catch (error) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);

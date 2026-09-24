@@ -38,6 +38,18 @@
 
   /* nav height */
   --nav-height: 64px;
+
+  /* spacing */
+  --spacing-xs: 4px;
+  --spacing-s: 8px;
+  --spacing-m: 16px;
+  --spacing-l: 24px;
+  --spacing-xl: 32px;
+  --spacing-xxl: 48px;
+
+  /* grid */
+  --grid-container-width: min(1200px, 100% - 48px);
+  --grid-column-width: calc(var(--grid-container-width) / 12);
 }
 
 /* fallback fonts */
