@@ -7,10 +7,11 @@ import {
   decorateTemplateAndTheme,
   waitForFirstImage,
   loadSection,
-  loadSections,
+  sampleRUM,
   loadCSS,
   buildBlock,
 } from './aem.js';
+import { decorateSection } from './section.js';
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
   const innerTT = window.trustedTypes.createPolicy('tt-inner', {
@@ -187,7 +188,10 @@ async function loadEager(doc) {
   if (main) {
     decorateMain(main);
     document.body.classList.add('appear');
-    await loadSection(main.querySelector('.section'), waitForFirstImage);
+    await loadSection(main.querySelector('.section'), async (section) => {
+      decorateSection(section);
+      await waitForFirstImage(section);
+    });
   }
 
   try {
@@ -224,7 +228,14 @@ async function loadLazy(doc) {
   loadHeader(doc.querySelector('body > header'));
 
   const main = doc.querySelector('main');
-  await loadSections(main);
+  const sections = [...main.querySelectorAll('div.section')];
+  for (let i = 0; i < sections.length; i += 1) {
+    // eslint-disable-next-line no-await-in-loop
+    await loadSection(sections[i], decorateSection);
+    if (i === 0 && sampleRUM.enhance) {
+      sampleRUM.enhance();
+    }
+  }
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;

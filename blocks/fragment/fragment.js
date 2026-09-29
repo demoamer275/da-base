@@ -10,8 +10,10 @@ import {
 } from '../../scripts/scripts.js';
 
 import {
-  loadSections,
+  loadSection,
 } from '../../scripts/aem.js';
+
+import { decorateSection } from '../../scripts/section.js';
 
 /**
  * Loads a fragment.
@@ -35,7 +37,11 @@ export async function loadFragment(path) {
       resetAttributeBase('source', 'srcset');
 
       decorateMain(main);
-      await loadSections(main);
+      const sections = [...main.querySelectorAll('div.section')];
+      for (let i = 0; i < sections.length; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        await loadSection(sections[i], decorateSection);
+      }
       return main;
     }
   }
