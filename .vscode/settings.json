@@ -1,5 +1,4 @@
 {
     "chat.experimental.useSkillAdherencePrompt": true,
-    "chat.permissions.default": "autopilot",
     "chat.newSession.defaultMode": "Agent"
 }
