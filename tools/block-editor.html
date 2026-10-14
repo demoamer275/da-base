@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<!--
+  Block Editor — DA library plugin. Edits a selected block table using the
+  dialog definition at /blocks/<block>/<block>.json.
+
+  Registration: in https://da.live/config#/<org>/<repo>/ add a row to the
+  `library` sheet:  title: Block Editor   path: /tools/block-editor.html
+-->
+<html lang="en">
+  <head>
+    <title>Block Editor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/tools/block-editor/block-editor.css">
+    <script src="https://da.live/nx/utils/sdk.js" type="module"></script>
+    <script src="/tools/block-editor/block-editor.js" type="module"></script>
+  </head>
+  <body>
+    <main>
+      <p id="status" class="status">Waiting for DA…</p>
+      <div class="actions">
+        <button id="load" type="button" disabled>Load selection</button>
+        <button id="save" type="button" class="primary" disabled>Save</button>
+      </div>
+      <form id="form" onsubmit="return false"></form>
+    </main>
+  </body>
+</html>

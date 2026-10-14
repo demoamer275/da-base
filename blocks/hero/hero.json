@@ -1,0 +1,11 @@
+{
+  "variants": [
+    {
+      "name": "default",
+      "rows": [
+        { "name": "image", "label": "Image", "type": "image" },
+        { "name": "content", "label": "Content", "type": "richtext" }
+      ]
+    }
+  ]
+}

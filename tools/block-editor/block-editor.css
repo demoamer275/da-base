@@ -1,0 +1,99 @@
+body {
+  margin: 0;
+  font: 14px/1.4 system-ui, sans-serif;
+  color: #222;
+}
+
+main {
+  padding: 12px;
+}
+
+.status {
+  margin: 0 0 12px;
+  padding: 8px;
+  border-radius: 4px;
+  background: #f1f1f1;
+}
+
+.status-error {
+  background: #fde8e8;
+  color: #a10000;
+}
+
+.status-success {
+  background: #e6f6ea;
+  color: #0b6b27;
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+button {
+  padding: 4px 10px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+button.primary {
+  background: #1473e6;
+  border-color: #1473e6;
+  color: #fff;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.field label {
+  font-weight: 600;
+}
+
+.field input,
+.field select,
+.richtext {
+  padding: 6px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  font: inherit;
+}
+
+.richtext {
+  min-height: 80px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 4px;
+}
+
+.preview {
+  max-width: 100%;
+  max-height: 120px;
+  object-fit: contain;
+}
+
+.section {
+  margin: 0 0 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.section legend {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-weight: 600;
+}
