@@ -49,6 +49,19 @@ test('review fixes', () => {
   assert.deepEqual(readValues(fixed, [[pic], ['']]), [pic, '']);
 });
 
+test('rows mode: JSON defines the table rows', () => {
+  const fixed = pickVariant(hero, 'default').variant;
+  const values = readValues(fixed, [['<img src="a">', 'extra col'], ['<p>c</p>'], ['extra row']]);
+  assert.deepEqual(values, ['<img src="a">', '<p>c</p>']);
+  assert.equal(buildTableHtml('hero', fixed, values), '<table><tr><td colspan="1">hero</td></tr><tr><td><img src="a"></td></tr><tr><td><p>c</p></td></tr></table>');
+  assert.equal(readValues(fixed, [['<img src="a">']]).length, 2);
+});
+
+test('row mode: one section per table row', () => {
+  const rep = pickVariant(cards, 'default').variant;
+  assert.equal(readValues(rep, [['a', 'b'], ['c', 'd'], ['e', 'f']]).length, 3);
+});
+
 test('readValues', () => {
   const fixed = pickVariant(hero, 'default').variant;
   assert.deepEqual(readValues(fixed, [['<img src="a">'], []]), ['<img src="a">', '']);
