@@ -4,7 +4,7 @@
  */
 
 const ENTITIES = {
-  '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&nbsp;': ' ',
+  '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&nbsp;': ' ',
 };
 
 function escapeHtml(value) {
@@ -44,23 +44,36 @@ export function cellToValue(type, html = '') {
     return match ? match[1].replace(/&amp;/g, '&') : '';
   }
   return html
+    .replace(/<\/(p|div|li|h[1-6])>|<br\s*\/?>/gi, ' ')
     .replace(/<[^>]*>/g, '')
-    .replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (m) => ENTITIES[m])
+    .replace(/&#x([0-9a-f]+);/gi, (m, hex) => String.fromCodePoint(parseInt(hex, 16)))
+    .replace(/&#(\d+);/g, (m, dec) => String.fromCodePoint(Number(dec)))
+    .replace(/&(amp|lt|gt|quot|nbsp);/g, (m) => ENTITIES[m])
+    .replace(/\s+/g, ' ')
     .trim();
 }
 
+// Image values are either the untouched original cell HTML (starts with '<',
+// preserving <picture>, alt, etc.) or a new URL entered by the author.
 export function valueToCell(type, value = '') {
   if (type === 'richtext') return value;
-  if (type === 'image') return value ? `<img src="${escapeHtml(value)}">` : '';
+  if (type === 'image') {
+    if (value.startsWith('<')) return value;
+    return value ? `<img src="${escapeHtml(value)}">` : '';
+  }
   return escapeHtml(value);
+}
+
+function initialValue(type, html = '') {
+  return type === 'image' ? html.trim() : cellToValue(type, html);
 }
 
 export function readValues(variant, bodyRows) {
   if (variant.mode === 'rows') {
-    return variant.cells.map((cell, i) => cellToValue(cell.type, bodyRows[i]?.[0]));
+    return variant.cells.map((cell, i) => initialValue(cell.type, bodyRows[i]?.[0]));
   }
   const rows = bodyRows.length ? bodyRows : [[]];
-  return rows.map((row) => variant.cells.map((cell, c) => cellToValue(cell.type, row[c])));
+  return rows.map((row) => variant.cells.map((cell, c) => initialValue(cell.type, row[c])));
 }
 
 export function buildTableHtml(headerHtml, variant, values) {

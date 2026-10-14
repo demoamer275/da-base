@@ -40,12 +40,21 @@ test('cell conversions', () => {
   assert.equal(cellToValue('image', 'none'), '');
 });
 
+test('review fixes', () => {
+  assert.equal(cellToValue('text', '<p>a</p><p>b</p>'), 'a b');
+  assert.equal(cellToValue('text', 'it&#8217;s &#x41;'), 'it\u2019s A');
+  const pic = '<picture><source srcset="x.webp"><img src="x.jpg" alt="Alt"></picture>';
+  assert.equal(valueToCell('image', pic), pic);
+  const fixed = pickVariant(hero, 'default').variant;
+  assert.deepEqual(readValues(fixed, [[pic], ['']]), [pic, '']);
+});
+
 test('readValues', () => {
   const fixed = pickVariant(hero, 'default').variant;
-  assert.deepEqual(readValues(fixed, [['<img src="a">'], []]), ['a', '']);
+  assert.deepEqual(readValues(fixed, [['<img src="a">'], []]), ['<img src="a">', '']);
   const rep = pickVariant(cards, 'default').variant;
   assert.deepEqual(readValues(rep, []), [['', '']]);
-  assert.deepEqual(readValues(rep, [['<img src="a">']]), [['a', '']]);
+  assert.deepEqual(readValues(rep, [['<img src="a">']]), [['<img src="a">', '']]);
 });
 
 test('buildTableHtml', () => {

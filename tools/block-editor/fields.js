@@ -1,6 +1,26 @@
 /*
  * DOM builders for the Block Editor plugin. Each returns { el, getValue }.
  */
+import { cellToValue } from './dialog.js';
+
+const SAFE_URL = /^(https?:|mailto:|\/|#)/i;
+const BLOCKED_TAGS = 'script,style,iframe,object,embed,link,meta,base,form,input,button,textarea,select';
+
+// Parse document HTML inertly and strip anything that could execute before it
+// is placed in the live editor.
+function sanitize(html) {
+  const { body } = new DOMParser().parseFromString(html, 'text/html');
+  body.querySelectorAll(BLOCKED_TAGS).forEach((node) => node.remove());
+  body.querySelectorAll('*').forEach((node) => {
+    [...node.attributes].forEach(({ name, value }) => {
+      const isUrl = ['href', 'src', 'srcset', 'action', 'formaction', 'xlink:href'].includes(name);
+      if (name.startsWith('on') || name === 'style' || (isUrl && !SAFE_URL.test(value.trim()))) {
+        node.removeAttribute(name);
+      }
+    });
+  });
+  return [...body.childNodes];
+}
 
 let fieldCount = 0;
 
@@ -27,7 +47,7 @@ function textField(cell, value) {
 
 function selectField(cell, value) {
   const select = document.createElement('select');
-  const options = [...cell.options];
+  const options = [...(cell.options || [])];
   // Keep an unknown existing value rather than silently replacing it.
   if (value && !options.some((o) => o.value === value)) options.unshift({ title: value, value });
   options.forEach(({ title, value: v }) => {
@@ -40,23 +60,30 @@ function selectField(cell, value) {
   return { el: labelled(cell, select), getValue: () => select.value };
 }
 
-function imageField(cell, value) {
+function imageField(cell, original) {
+  const originalSrc = cellToValue('image', original);
   const input = document.createElement('input');
   input.type = 'url';
   input.placeholder = 'https://…';
-  input.value = value;
+  input.value = originalSrc;
   const el = labelled(cell, input);
   const preview = document.createElement('img');
   preview.className = 'preview';
   preview.alt = '';
   const update = () => {
-    preview.hidden = !input.value;
-    if (input.value) preview.src = input.value;
+    const src = input.value.trim();
+    preview.hidden = !SAFE_URL.test(src);
+    if (!preview.hidden) preview.src = src;
   };
   input.addEventListener('change', update);
   update();
   el.append(preview);
-  return { el, getValue: () => input.value.trim() };
+  // Unchanged URL: keep the original cell HTML (<picture>, alt, link).
+  const getValue = () => {
+    const src = input.value.trim();
+    return src === originalSrc && original ? original : src;
+  };
+  return { el, getValue };
 }
 
 const RT_BUTTONS = [
@@ -72,8 +99,8 @@ function richtextField(cell, value) {
   editor.contentEditable = 'true';
   editor.setAttribute('role', 'textbox');
   editor.setAttribute('aria-multiline', 'true');
-  // Cell content is the author's own document content; it is rendered for editing.
-  editor.innerHTML = value;
+  // Sanitized: the cell HTML comes from a shared document.
+  editor.replaceChildren(...sanitize(value));
   const el = labelled(cell, editor);
   const toolbar = document.createElement('div');
   toolbar.className = 'toolbar';
@@ -86,7 +113,7 @@ function richtextField(cell, value) {
     button.addEventListener('click', () => {
       // eslint-disable-next-line no-alert
       const arg = cmd === 'createLink' ? window.prompt('Link URL') : null;
-      if (cmd === 'createLink' && !arg) return;
+      if (cmd === 'createLink' && !(arg && SAFE_URL.test(arg.trim()))) return;
       editor.focus();
       document.execCommand(cmd, false, arg);
     });
