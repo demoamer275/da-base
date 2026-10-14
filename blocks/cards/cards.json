@@ -1,0 +1,14 @@
+{
+  "variants": [
+    {
+      "name": "default",
+      "row": {
+        "label": "Card",
+        "cells": [
+          { "name": "image", "type": "image" },
+          { "name": "body", "type": "richtext" }
+        ]
+      }
+    }
+  ]
+}
