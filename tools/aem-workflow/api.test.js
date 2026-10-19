@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  AEM_HOST, ENDPOINT, previewUrl, errorMessage, describeItem, createClient,
+  AEM_HOST, ENDPOINT, previewUrl, errorMessage, describeItem, createClient, safeHref,
 } from './api.js';
 
 function mockFetch(responses) {
@@ -91,6 +91,22 @@ test('csrf failure aborts post', async () => {
   const { calls, fetchFn } = mockFetch([{ status: 401, body: '' }, { body: {} }]);
   await assert.rejects(createClient({ token: 't', fetchFn }).start({ payload: 'p', title: 't' }), { status: 401 });
   assert.equal(calls.length, 1);
+});
+
+test('missing csrf token aborts post', async () => {
+  const { calls, fetchFn } = mockFetch([{ body: '<html>' }, { body: {} }]);
+  await assert.rejects(createClient({ token: 't', fetchFn }).start({ payload: 'p', title: 't' }), { status: 403 });
+  assert.equal(calls.length, 1);
+});
+
+test('safeHref', () => {
+  assert.equal(safeHref('https://x.aem.page/a'), 'https://x.aem.page/a');
+  assert.equal(safeHref('http://x/a'), 'http://x/a');
+  assert.equal(safeHref('javascript:alert(1)'), ''); // eslint-disable-line no-script-url
+  assert.equal(safeHref(' JaVaScRiPt:alert(1)'), '');
+  assert.equal(safeHref('data:text/html,x'), '');
+  assert.equal(safeHref('/content/a'), '');
+  assert.equal(safeHref(null), '');
 });
 
 test('errorMessage', () => {

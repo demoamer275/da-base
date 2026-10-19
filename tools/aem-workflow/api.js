@@ -9,6 +9,15 @@ export function previewUrl({ org, repo, path = '/' }) {
   return `https://main--${repo}--${org}.aem.page${clean || '/'}`;
 }
 
+export function safeHref(value) {
+  try {
+    const url = new URL(String(value ?? '').trim());
+    return url.protocol === 'https:' || url.protocol === 'http:' ? url.href : '';
+  } catch {
+    return '';
+  }
+}
+
 export function errorMessage(err) {
   const status = err?.status;
   if (status === 0) return 'Could not reach AEM (network or CORS configuration).';
@@ -64,9 +73,12 @@ export function createClient({ host = AEM_HOST, token, fetchFn = (...args) => fe
 
   async function post(body) {
     const csrf = await request(CSRF_PATH);
+    if (!csrf?.token) {
+      throw Object.assign(new Error('AEM did not return a CSRF token.'), { status: 403 });
+    }
     return request(ENDPOINT, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'CSRF-Token': csrf?.token || '' },
+      headers: { 'Content-Type': 'application/json', 'CSRF-Token': csrf.token },
       body: JSON.stringify(body),
     });
   }

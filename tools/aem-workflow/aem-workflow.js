@@ -8,7 +8,7 @@
 import DA_SDK from 'https://da.live/nx/utils/sdk.js';
 // eslint-disable-next-line import/extensions
 import {
-  createClient, previewUrl, describeItem, errorMessage,
+  createClient, previewUrl, describeItem, errorMessage, safeHref,
 } from './api.js';
 
 const SDK_TIMEOUT_MS = 3000;
@@ -42,11 +42,11 @@ async function act(fn, success) {
   busy(true);
   try {
     await fn();
-    setStatus(success);
-    await loadTasks(true);
+    await loadTasks(success);
   } catch (err) {
-    setStatus(errorMessage(err), 'error');
-    if (err.status === 403 || err.status === 404) await loadTasks(true);
+    const message = errorMessage(err);
+    setStatus(message, 'error');
+    if (err.status === 403 || err.status === 404) await loadTasks(message, 'error');
   } finally {
     busy(false);
   }
@@ -58,10 +58,13 @@ function renderCard(item) {
   li.append(el('strong', 'name', d.heading));
   if (d.step) li.append(el('span', 'step', d.step));
   if (d.payload) {
-    const a = el('a', 'payload', d.payload);
-    a.href = d.payload;
-    a.target = '_blank';
-    a.rel = 'noopener';
+    const href = safeHref(d.payload);
+    const a = el(href ? 'a' : 'span', 'payload', d.payload);
+    if (href) {
+      a.href = href;
+      a.target = '_blank';
+      a.rel = 'noopener';
+    }
     li.append(a);
   }
   const meta = [d.initiator && `by ${d.initiator}`, d.created && new Date(d.created).toLocaleString()]
@@ -94,18 +97,29 @@ function renderCard(item) {
   return li;
 }
 
-loadTasks = async (quiet = false) => {
+let loadSeq = 0;
+
+// `prefix` is an action result to keep in the status line; `kind` is its status style.
+loadTasks = async (prefix = '', kind = '') => {
+  loadSeq += 1;
+  const seq = loadSeq;
   const list = $('list');
-  if (!quiet) setStatus('Loading tasks.');
+  busy(true);
+  if (!prefix) setStatus('Loading tasks.');
   try {
     const data = await client.list();
+    if (seq !== loadSeq) return;
     const items = data?.workItems || [];
     list.replaceChildren(...items.map(renderCard));
     if (!items.length) list.append(el('li', 'empty', 'No tasks assigned to you.'));
-    if (!quiet) setStatus(`${items.length} task${items.length === 1 ? '' : 's'} assigned to you.`);
+    setStatus(prefix || `${items.length} task${items.length === 1 ? '' : 's'} assigned to you.`, kind);
   } catch (err) {
+    if (seq !== loadSeq) return;
     list.replaceChildren();
-    setStatus(errorMessage(err), 'error');
+    const message = `Could not load tasks: ${errorMessage(err)}`;
+    setStatus(prefix ? `${prefix} ${message}` : message, 'error');
+  } finally {
+    if (seq === loadSeq) busy(false);
   }
 };
 
