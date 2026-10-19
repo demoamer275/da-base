@@ -23,9 +23,9 @@ Backend: `DaWorkflowServlet` at `/bin/ma10226/daworkflow`, documented in
 The AEM author currently sends no `Access-Control-Allow-Origin` header (preflight
 checked 2026-10-19). Add an OSGi config
 `com.adobe.granite.cors.impl.CORSPolicyImpl~daworkflow.cfg.json` with:
-- `alloworigin`: none
-- `alloworiginregexp`: `https://.*--da-base--demoamer275\.aem\.(page|live)`,
-  `http://localhost:3000`
+- `alloworigin`: `http://localhost:3000`
+- `alloworiginregexp`: `https://[a-z0-9-]+--demoamer275\.(aem\.(page|live)|preview\.da\.live)`
+  (DA's Experience Workspace serves the plugin from `{branch}--{repo}--{org}.preview.da.live`)
 - `allowedpaths`: `/bin/ma10226/daworkflow`, `/libs/granite/csrf/token.json`
 - `supportedmethods`: GET, POST, OPTIONS
 - `supportedheaders`: Authorization, Content-Type, CSRF-Token
