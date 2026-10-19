@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!--
+  Workfront — DA library plugin. Browse your Workfront projects, tasks, issues
+  and documents and insert a link to one into the open document.
+
+  Auth: signs in to Adobe IMS with the "DA Workfront" Developer Console OAuth Web
+  App credential. The code exchange and Workfront API calls run in the App
+  Builder action configured in /tools/workfront/workfront.js (RUNTIME_URL).
+
+  Registration (content step, done once per site):
+  In https://da.live/config#/demoamer275/da-base/ add a row to the `library` sheet:
+    title: Workfront
+    path:  /tools/workfront.html
+-->
+<html lang="en">
+  <head>
+    <title>Workfront</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/tools/workfront/workfront.css">
+    <!-- Import DA App SDK first so the plugin is ready to receive DA's init message -->
+    <script src="https://da.live/nx/utils/sdk.js" type="module"></script>
+    <script src="/tools/workfront/workfront.js" type="module"></script>
+  </head>
+  <body>
+    <main>
+      <p id="status" class="status">Loading…</p>
+
+      <section id="connect-view" class="panel" hidden>
+        <p class="note">Sign in with your Adobe ID to browse Workfront.</p>
+        <button id="connect" type="button">Connect to Workfront</button>
+      </section>
+
+      <section id="browse-view" hidden>
+        <div class="toolbar">
+          <button id="back" type="button" class="secondary" hidden>← Projects</button>
+          <select id="project-filter" aria-label="Project filter">
+            <option value="my">My projects</option>
+            <option value="owned">Projects I own</option>
+          </select>
+          <div id="tabs" class="tabs" role="tablist" hidden>
+            <button type="button" role="tab" data-resource="tasks" class="secondary">Tasks</button>
+            <button type="button" role="tab" data-resource="issues" class="secondary">Issues</button>
+            <button type="button" role="tab" data-resource="documents" class="secondary">Documents</button>
+          </div>
+        </div>
+        <h2 id="list-title"></h2>
+        <ul id="list" class="list"></ul>
+        <button id="logout" type="button" class="secondary">Sign out</button>
+      </section>
+    </main>
+  </body>
+</html>
