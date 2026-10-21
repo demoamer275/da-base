@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!--
+  AEM Workflow - DA library plugin. Lists the AEM workflow tasks assigned to you,
+  lets you choose the next step, and starts the da-approve workflow on the open page.
+
+  Auth: uses the IMS token from the DA SDK as a bearer token against the AEM author
+  (host set in /tools/aem-workflow/api.js). The author needs a CORS policy for this
+  site's origins on /bin/ma10226/daworkflow and /libs/granite/csrf/token.json.
+
+  Registration (content step, done once per site):
+  In https://da.live/config#/demoamer275/da-base/ add a row to the `library` sheet:
+    title: AEM Workflow
+    path:  /tools/aem-workflow.html
+-->
+<html lang="en">
+  <head>
+    <title>AEM Workflow</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="/tools/aem-workflow/aem-workflow.css">
+    <!-- Import DA App SDK first so the plugin is ready to receive DA's init message -->
+    <script src="https://da.live/nx/utils/sdk.js" type="module"></script>
+    <script src="/tools/aem-workflow/aem-workflow.js" type="module"></script>
+  </head>
+  <body>
+    <main>
+      <p id="status" class="status">Loading.</p>
+
+      <section id="start-view" class="panel" hidden>
+        <h2>Start approval</h2>
+        <label for="payload" class="note">Page</label>
+        <input id="payload" type="text" readonly>
+        <label for="title" class="note">Title</label>
+        <input id="title" type="text">
+        <p class="note">Model: da-approve</p>
+        <button id="start" type="button">Start approval</button>
+      </section>
+
+      <section id="tasks-view" hidden>
+        <div class="toolbar">
+          <h2>My tasks</h2>
+          <button id="refresh" type="button" class="secondary">Refresh</button>
+        </div>
+        <ul id="list" class="list"></ul>
+      </section>
+    </main>
+  </body>
+</html>
