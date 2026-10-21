@@ -1,0 +1,145 @@
+body {
+  margin: 0;
+  padding: 12px;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #222;
+  background: #fff;
+}
+
+body h2 {
+  margin: 8px 0 4px;
+  font-size: 14px;
+}
+
+body button,
+body input,
+body textarea {
+  box-sizing: border-box;
+  margin: 4px 0;
+  padding: 6px 8px;
+  font: inherit;
+}
+
+body input,
+body textarea {
+  display: block;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+body input[readonly] {
+  background: #f6f6f6;
+  color: #555;
+}
+
+body button {
+  border: 1px solid #3b63fb;
+  border-radius: 4px;
+  background: #3b63fb;
+  color: #fff;
+  cursor: pointer;
+}
+
+body button.secondary {
+  border-color: #ccc;
+  background: #fff;
+  color: #222;
+}
+
+body button:disabled {
+  border-color: #ccc;
+  background: #eee;
+  color: #888;
+  cursor: not-allowed;
+}
+
+#start {
+  display: block;
+  width: 100%;
+}
+
+.status {
+  margin: 0 0 12px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  background: #f2f4ff;
+}
+
+.status.error {
+  background: #fdecea;
+  color: #c62828;
+}
+
+.status.warn {
+  background: #fff8e1;
+  color: #9a6700;
+}
+
+.panel {
+  margin: 0 0 12px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.note {
+  display: block;
+  margin: 4px 0 0;
+  color: #666;
+  font-size: 12px;
+}
+
+.toolbar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.list {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.list li.card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 0 8px;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+}
+
+.list li.empty {
+  color: #666;
+}
+
+.list .name,
+.list .payload {
+  overflow-wrap: anywhere;
+}
+
+.list .payload {
+  color: #3b63fb;
+}
+
+.list .meta {
+  color: #666;
+  font-size: 12px;
+}
+
+.list .routes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  align-items: center;
+}
+
+.list .routes small {
+  flex-basis: 100%;
+}
